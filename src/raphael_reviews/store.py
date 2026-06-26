@@ -41,6 +41,21 @@ class ReviewsStore:
                 )
                 """
             )
+            self._seed()
+
+    def _seed(self) -> None:
+        if self.list_reviews():
+            return
+        now = _utc_now()
+        with self._conn() as conn:
+            conn.executemany(
+                """INSERT INTO reviews (id, module_id, workspace_id, title, source_branch, target_branch, status, assignee, summary, created_at)
+                   VALUES (?, ?, 'default', ?, ?, ?, ?, ?, ?, ?)""",
+                [
+                    ("pr-42", "power-board-v2", "USB-PD input stage", "feature/usb-pd-input", "main", "open", "Alex Chen", "14 components affected", now),
+                    ("pr-39", "power-board-v2", "Stackup update 4-layer", "review/v2.3-fab-release", "main", "open", "Sam Rivera", "2 layer changes", now),
+                ],
+            )
 
     def list_reviews(self, status: str | None = None) -> list[dict[str, Any]]:
         with self._conn() as conn:

@@ -8,6 +8,7 @@ from typing import Any
 import httpx
 from fastapi import APIRouter, HTTPException
 
+from raphael_reviews.diff import review_diff_from_commits
 from raphael_reviews.store import ReviewsStore
 
 router = APIRouter(tags=["reviews"])
@@ -66,15 +67,7 @@ def review_diff(review_id: str) -> dict[str, Any]:
             commits = res.json().get("commits", []) if res.status_code == 200 else []
     except httpx.RequestError:
         commits = []
-    return {
-        "bom": [{"change": "added", "reference": "U1", "value": "placeholder"}],
-        "drc": [],
-        "electrical": [],
-        "schematic": [],
-        "layout": [],
-        "ops": commits,
-        "summary": {"components": 1, "nets": 0, "drc_warnings": 0, "drc_errors": 0, "schematic": 0, "layout": 0},
-    }
+    return review_diff_from_commits(commits, [])
 
 
 @router.post("/{review_id}/merge")
