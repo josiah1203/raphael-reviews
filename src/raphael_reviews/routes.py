@@ -9,10 +9,10 @@ import httpx
 from fastapi import APIRouter, HTTPException
 
 from raphael_reviews.diff import review_diff_from_commits
-from raphael_reviews.store import ReviewsStore
+from raphael_reviews.sonoma_store import SonomaApiStore
 
 router = APIRouter(tags=["reviews"])
-_store = ReviewsStore()
+_store = SonomaApiStore()
 
 
 def _publish_event(event_type: str, data: dict[str, Any]) -> None:
@@ -42,13 +42,12 @@ def get_review(review_id: str) -> dict[str, Any]:
 def create_review(body: dict[str, Any]) -> dict[str, Any]:
     module_id = body.get("module_id") or body.get("repo_id", "")
     review = _store.create_review(
-        module_id=module_id,
+        repo_id=module_id,
         title=body["title"],
         source_branch=body["source_branch"],
         target_branch=body.get("target_branch", "main"),
         assignee=body.get("assignee"),
         summary=body.get("summary"),
-        workspace_id=body.get("workspace_id", "default"),
     )
     _publish_event("raphael.reviews.created", review)
     return review
