@@ -1,0 +1,12 @@
+openapi: 3.1.0
+info:
+  title: raphael-reviews
+  version: 0.1.0
+  description: Review requests, gates, threads, merge workflows
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
